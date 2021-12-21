@@ -1,9 +1,7 @@
 import React from "react";
 import {Routes, Route} from "react-router-dom";
-import {
-  Home,
-  Whoops404,
-} from "./pages";
+import { Whoops404 } from "./pages";
+import Home from "./home";
 
 function App() {
   return (
