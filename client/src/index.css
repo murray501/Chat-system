@@ -38,16 +38,22 @@ body { margin: 0;
   color: #fff;
 }
 
-#messages {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+#messageList {
+  width: 400px;
+  margin: 10px;
+  box-shadow: 10px 10px 5px grey;
 }
 
-#messages > li {
-  padding: 0.5rem 1 rem;
+.listitem {
+  background: linear-gradient(#fff, #eee);
+  line-height: 30px;
+  padding: 0 10px;
 }
 
-#messages > li:nth-child(odd) {
-  background: #efefef;
+.even {
+  background: linear-gradient(#ddd, #ccc);
+}
+
+.top {
+  background: linear-gradient(#fff, #ffa07a);
 }

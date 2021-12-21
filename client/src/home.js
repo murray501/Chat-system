@@ -2,6 +2,7 @@ import React, { useState, useEffect, useReducer } from "react";
 import { io } from "socket.io-client";
 import { useInput } from "./hooks";
 import "./index.css";
+import ReactList from 'react-list';
 
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
@@ -9,7 +10,8 @@ export default function Home() {
     const [first, setFirst] = useState(true);
     const [name, setName] = useState("");
     const [messages, setMessage] = useReducer(
-        (messages, newMessage) => [...messages, newMessage],
+        (messages, newMessage) => [newMessage, ...messages
+        ],
         []
     );
 
@@ -39,6 +41,9 @@ export default function Home() {
         setSocket(socket)
     }, [])
 
+    const systemMessages = messages.filter(x => x.from === "System")
+    const otherMessages = messages.filter(x => x.from !== "System")
+
     return (
         <>
         <form id="form" onSubmit={submit}>
@@ -50,13 +55,33 @@ export default function Home() {
             />
             <button>Send</button>
         </form>
-        <ul id="messages">
-            {messages.map(({from, message}, i) => (
-                <li>
-                    [{from}] {message}
-                </li>
-            ))}
-        </ul>
+        <div style={{display: "flex"}}>
+            <MessageList messages={otherMessages} />
+            <MessageList messages={systemMessages} />
+        </div>
         </>
+    )
+}
+
+function MessageList({messages}) {
+    const renderItem = (index, key) => {
+        const attribute = (index === 0 ? ' top' : (index % 2 ? '' : ' even'))
+        return( 
+        <div key={key} class= {"listitem" + attribute}>
+            [{messages[index].from}] {messages[index].message} 
+        </div>
+        )
+    }
+
+    return (
+        <div>
+            <div id="messageList" style={{overflow: 'auto', maxHeight: 400}}>
+                <ReactList
+                    itemRenderer={renderItem}
+                    length={messages.length}
+                    type='uniform'
+                />
+            </div>
+        </div>
     )
 }
