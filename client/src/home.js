@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useReducer } from "react";
 import { io } from "socket.io-client";
 import { useInput } from "./hooks";
+import "./index.css";
 
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
     const [socket, setSocket] = useState();
+    const [first, setFirst] = useState(true);
+    const [name, setName] = useState("");
     const [messages, setMessage] = useReducer(
         (messages, newMessage) => [...messages, newMessage],
         []
@@ -12,7 +15,13 @@ export default function Home() {
 
     const submit = e => {
         e.preventDefault();
-        socket.emit('chat message', messageProps.value);
+        if (first) {
+            socket.emit('enter name', messageProps.value);
+            setName(messageProps.value);
+            setFirst(false);  
+        } else {
+            socket.emit('chat message', {from: name, message: messageProps.value});
+        }
         resetMessage();
     }
 
@@ -21,8 +30,10 @@ export default function Home() {
         socket.on("connect", () => {
             console.log(socket.id);
         })
+        socket.on('enter name', msg => {
+            setMessage(msg);
+        })
         socket.on('chat message', msg => {
-            console.log('message: ' + msg);
             setMessage(msg);
         })
         setSocket(socket)
@@ -30,19 +41,19 @@ export default function Home() {
 
     return (
         <>
-        <form onSubmit={submit}>
-            <input
+        <form id="form" onSubmit={submit}>
+            <input id="input" autocomplete="off"
                 {...messageProps}
                 type="text"
                 placeholder="message..."
                 required
             />
-            <button>SEND</button>
+            <button>Send</button>
         </form>
-        <ul>
-            {messages.map((message, i) => (
+        <ul id="messages">
+            {messages.map(({from, message}, i) => (
                 <li>
-                    {message}
+                    [{from}] {message}
                 </li>
             ))}
         </ul>

@@ -9,13 +9,24 @@ const io = new Server(server, {
     }
 });
 
+const map = new Map();
+
+const getName = (socket) => {
+    return map.get(socket.id);
+} 
+
 io.on('connection', (socket) => {
-    console.log('a user connected');
-    console.log(socket.id);
-    socket.emit('chat message', 'Hello');
-    socket.on('chat message', msg => {
-        console.log('message: ' + msg);
+    socket.emit('enter name', {from: 'System', message: 'Please enter your name.'});
+    socket.on('enter name', name => {
+        map.set(socket.id, name)
+        socket.emit('chat message',{from: 'System', message: 'Welcome ' + name});
+        socket.broadcast.emit('chat message', {from: 'System', message: name + ' is entered.'});
+    })
+    socket.on('chat message', (msg) => {
         io.emit('chat message', msg);
+    })
+    socket.on('disconnect', () => {
+        io.emit('chat message', {from: 'System', message: getName(socket) + ' is leaving.'});
     })
 });
 
