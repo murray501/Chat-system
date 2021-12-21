@@ -12,9 +12,10 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log('a user connected');
     console.log(socket.id);
+    socket.emit('chat message', 'Hello');
     socket.on('chat message', msg => {
         console.log('message: ' + msg);
-        socket.emit('chat message', "world");
+        io.emit('chat message', msg);
     })
 });
 

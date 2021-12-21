@@ -1,23 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { io } from "socket.io-client";
-
-localStorage.debug = 'socket.io-client:socket';
+import { useInput } from "./hooks";
 
 export default function Home() {
+    const [messageProps, resetMessage] = useInput("");
     const [socket, setSocket] = useState();
+
+    const submit = e => {
+        e.preventDefault();
+        socket.emit('chat message', messageProps.value);
+        resetMessage();
+    }
 
     useEffect(() => {
         const socket = io("http://localhost:5000");
-        socket.emit('chat message', 'hello');
         socket.on("connect", () => {
             console.log(socket.id)
         })
         socket.on('chat message', msg => {
             console.log('message: ' + msg);
         })
+        setSocket(socket)
     }, [])
 
     return (
-        <h1>Hello World</h1>
+        <form onSubmit={submit}>
+            <input
+                {...messageProps}
+                type="text"
+                placeholder="message..."
+                required
+            />
+            <button>SEND</button>
+        </form>
     )
 }
