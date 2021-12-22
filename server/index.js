@@ -22,10 +22,9 @@ const current = () => {
 }
 
 io.on('connection', (socket) => {
-    socket.emit('enter name', {from: 'System', message: 'Please enter your name.', time: current()});
     socket.on('enter name', name => {
         map.set(socket.id, name)
-        socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '. Please enter message.', time: current()});
+        socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
         socket.broadcast.emit('chat message', {from: 'System', message: name + ' is entered.', time: current()});
     })
     socket.on('chat message', (msg) => {

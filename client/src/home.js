@@ -7,7 +7,6 @@ import ReactList from 'react-list';
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
     const [socket, setSocket] = useState();
-    const [first, setFirst] = useState(true);
     const [nickname, setNickname] = useState("");
     const [messages, setMessage] = useReducer(
         (messages, newMessage) => [newMessage, ...messages],
@@ -16,13 +15,7 @@ export default function Home() {
 
     const submit = e => {
         e.preventDefault();
-        if (first) {
-            socket.emit('enter name', messageProps.value);
-            setNickname(messageProps.value);
-            setFirst(false);  
-        } else {
-            socket.emit('chat message', {from: nickname, message: messageProps.value});
-        }
+        socket.emit('chat message', {from: nickname, message: messageProps.value});
         resetMessage();
     }
 
@@ -31,14 +24,24 @@ export default function Home() {
         socket.on("connect", () => {
             console.log(socket.id);
         })
-        socket.on('enter name', msg => {
-            setMessage(msg);
-        })
         socket.on('chat message', msg => {
             setMessage(msg);
         })
+        
+        const nickname = prompt("please enter your name","Harry Potter");
+        if (nickname !== "") {
+            socket.emit('enter name', nickname);
+            setNickname(nickname);
+        }    
+
         setSocket(socket)
     }, [])
+
+    if (nickname === "") {
+        return (
+        <div>Please enter nickname</div>
+        );
+    }
 
     const systemMessages = messages.filter(x => x.from === "System")
     const otherMessages = messages.filter(x => x.from !== "System")
