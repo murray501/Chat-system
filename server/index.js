@@ -11,10 +11,10 @@ const io = new Server(server, {
     }
 });
 
-const map = new Map();
+const usermap = new Map();
 
 const getName = (socket) => {
-    return map.get(socket.id);
+    return usermap.get(socket.id);
 } 
 
 const current = () => {
@@ -22,8 +22,9 @@ const current = () => {
 }
 
 io.on('connection', (socket) => {
+    socket.emit('user list', [...usermap.values()]);
     socket.on('enter name', name => {
-        map.set(socket.id, name)
+        usermap.set(socket.id, name)
         socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
         socket.broadcast.emit('chat message', {from: 'System', message: name + ' is entered.', time: current()});
     })

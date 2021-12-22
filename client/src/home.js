@@ -12,6 +12,7 @@ export default function Home() {
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
+    const [userlist, setUserlist] = useState([])
 
     const submit = e => {
         e.preventDefault();
@@ -27,19 +28,21 @@ export default function Home() {
         socket.on('chat message', msg => {
             setMessage(msg);
         })
-        
-        const nickname = prompt("please enter your name","Harry Potter");
-        if (nickname !== "") {
+        socket.on('user list', userlist => {
+            let nickname = prompt("please enter your name","Harry Potter");
+            while (nickname === "" || userlist.includes(nickname)) {
+               nickname = prompt(nickname + " is used or empty. Please enter valid name.","Harry Potter");
+            }
             socket.emit('enter name', nickname);
-            setNickname(nickname);
-        }    
-
+            setNickname(nickname);    
+            setUserlist(userlist);
+        })
         setSocket(socket)
     }, [])
 
-    if (nickname === "") {
+    if (nickname === "" || userlist.includes(nickname)) {
         return (
-        <div>Please enter nickname</div>
+        <p>loading...</p>
         );
     }
 
@@ -58,8 +61,8 @@ export default function Home() {
             <button>Send</button>
         </form>
         <div style={{display: "flex"}}>
-            <MessageList messages={otherMessages} nickname={nickname}/>
-            <MessageList messages={systemMessages} nickname={nickname} />
+            <MessageList messages={systemMessages} nickname={nickname}/>
+            <MessageList messages={otherMessages} nickname={nickname} />
         </div>
         </>
     )
