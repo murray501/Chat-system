@@ -8,10 +8,9 @@ export default function Home() {
     const [messageProps, resetMessage] = useInput("");
     const [socket, setSocket] = useState();
     const [first, setFirst] = useState(true);
-    const [name, setName] = useState("");
+    const [nickname, setNickname] = useState("");
     const [messages, setMessage] = useReducer(
-        (messages, newMessage) => [newMessage, ...messages
-        ],
+        (messages, newMessage) => [newMessage, ...messages],
         []
     );
 
@@ -19,10 +18,10 @@ export default function Home() {
         e.preventDefault();
         if (first) {
             socket.emit('enter name', messageProps.value);
-            setName(messageProps.value);
+            setNickname(messageProps.value);
             setFirst(false);  
         } else {
-            socket.emit('chat message', {from: name, message: messageProps.value});
+            socket.emit('chat message', {from: nickname, message: messageProps.value});
         }
         resetMessage();
     }
@@ -56,19 +55,23 @@ export default function Home() {
             <button>Send</button>
         </form>
         <div style={{display: "flex"}}>
-            <MessageList messages={otherMessages} />
-            <MessageList messages={systemMessages} />
+            <MessageList messages={otherMessages} nickname={nickname}/>
+            <MessageList messages={systemMessages} nickname={nickname} />
         </div>
         </>
     )
 }
 
-function MessageList({messages}) {
+function MessageList({messages, nickname}) {
     const renderItem = (index, key) => {
-        const attribute = (index === 0 ? ' top' : (index % 2 ? '' : ' even'))
+        let attribute = messages[index].from === nickname ? ' me' : (index % 2 ? '' : ' even')
+        attribute = index === 0 ? ' top' : attribute
         return( 
         <div key={key} class= {"listitem" + attribute}>
             [{messages[index].from}] {messages[index].message} 
+            <div class="time">
+                {messages[index].time}
+            </div>
         </div>
         )
     }

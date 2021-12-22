@@ -57,3 +57,12 @@ body { margin: 0;
 .top {
   background: linear-gradient(#fff, #ffa07a);
 }
+
+.me {
+  background: linear-gradient(#fff, #4caa0e);
+}
+
+.time {
+  text-align: right;
+  font-size: 0.5rem;
+}
