@@ -22,17 +22,17 @@ const current = () => {
 }
 
 io.on('connection', (socket) => {
-    socket.emit('user list', [...usermap.values()]);
+    socket.emit('user list', {userlist: [...usermap.values()]});
     socket.on('enter name', name => {
         usermap.set(socket.id, name)
         socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
         socket.broadcast.emit('chat message', {from: 'System', message: name + ' is entered.', time: current()});
     })
     socket.on('chat message', (msg) => {
-        io.emit('chat message', {...msg, time: current()});
+        socket.broadcast.emit('chat message', {...msg, time: current()});
     })
     socket.on('disconnect', () => {
-        io.emit('chat message', {from: 'System', message: getName(socket) + ' is leaving.', time: current()});
+        socket.broadcast.emit('chat message', {from: 'System', message: getName(socket) + ' is leaving.', time: current()});
     })
 });
 

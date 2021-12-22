@@ -12,11 +12,13 @@ export default function Home() {
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
-    const [userlist, setUserlist] = useState([])
+    const [userlist, setUserlist] = useState([]);
 
     const submit = e => {
         e.preventDefault();
-        socket.emit('chat message', {from: nickname, message: messageProps.value});
+        const messageObj = {from: nickname, message: messageProps.value};
+        socket.emit('chat message', messageObj);
+        setMessage(messageObj);
         resetMessage();
     }
 
@@ -28,7 +30,9 @@ export default function Home() {
         socket.on('chat message', msg => {
             setMessage(msg);
         })
-        socket.on('user list', userlist => {
+        socket.on('user list', _userlist => {
+            const userlist = _userlist.userlist;
+            console.log("userlist from socket " + userlist.length);
             let nickname = prompt("please enter your name","Harry Potter");
             while (nickname === "" || userlist.includes(nickname)) {
                nickname = prompt(nickname + " is used or empty. Please enter valid name.","Harry Potter");
@@ -60,12 +64,46 @@ export default function Home() {
             />
             <button>Send</button>
         </form>
-        <div style={{display: "flex"}}>
+        <div id="contents">
             <MessageList messages={systemMessages} nickname={nickname}/>
-            <MessageList messages={otherMessages} nickname={nickname} />
+            <MessageList messages={otherMessages} nickname={nickname} />   
+            <UserList userlist={userlist}/>         
         </div>
         </>
     )
+}
+
+function UserList({userlist}) {
+    if (userlist.length === 0) {
+        return (
+            <div>
+                No user is found.
+            </div>
+        )
+    }
+
+    const renderItem = (index, key) => {
+        return(  
+            <div class="userlistItem">
+            <button>
+                {userlist[index]}
+            </button>
+            </div>
+        )
+    }
+
+    return (
+        <div>
+            <div id="userList" style={{overflow: 'auto', maxHeight: 400}}>
+                <ReactList
+                    itemRenderer={renderItem}
+                    length={userlist.length}
+                    type='uniform'
+                />
+            </div>
+        </div>
+    )
+
 }
 
 function MessageList({messages, nickname}) {

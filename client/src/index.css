@@ -66,3 +66,21 @@ body { margin: 10;
   text-align: right;
   font-size: 0.5rem;
 }
+
+#contents {
+  display: flex;
+  justify-content: space-around;
+}
+
+#userList {
+  margin: 10px;
+  background: #eee;
+  box-shadow: 10px 10px 5px grey;
+}
+
+.userlistItem {
+  margin: 10px;
+  height: 30px;
+  padding: 0 10px;
+  
+}
