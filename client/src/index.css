@@ -69,6 +69,7 @@ body { margin: 10;
 
 #contents {
   display: flex;
+  justify-content: space-around;
 }
 
 #userList {

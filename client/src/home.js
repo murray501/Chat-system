@@ -4,6 +4,11 @@ import { useInput } from "./hooks";
 import "./index.css";
 import ReactList from 'react-list';
 import Select from 'react-select';
+const dayjs = require('dayjs');
+
+const current = () => {
+    return dayjs().format();
+}
 
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
@@ -19,7 +24,10 @@ export default function Home() {
 
     const submit = e => {
         e.preventDefault();
-        const messageObj = {from: nickname, message: messageProps.value};
+        const messageType = (useroption.value === 'all') ? 'public' : 'private';
+        const messageObj = (messageType === 'public') ?
+            {from: nickname, message: messageProps.value, type: messageType, time: current()}
+            : {from: nickname, to: useroption.value, message: messageProps.value, type: messageType, time: current()}  
         socket.emit('chat message', messageObj);
         setMessage(messageObj);
         resetMessage();
@@ -48,8 +56,13 @@ export default function Home() {
         socket.on('enter', msg => {
             const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
             setMessage(message);
-            let newOptions = [...useroptions, {value: msg.who, label: msg.who}];
-            setUserOptions(newOptions);
+            console.log("before->" + JSON.stringify(useroptions));
+            let newData = [...useroptions];
+            newData.push({value: msg.who, label: msg.who});
+            console.log("newData = " + JSON.stringify(newData));
+            setUserOptions([...newData]);
+            console.log(msg.who + " is entered.");
+            console.log("after->" + JSON.stringify(useroptions));
         })
         socket.on('leave', msg => {
             const message= {from: 'System', message: msg.who + " is leaving.", time: msg.time}
@@ -89,7 +102,8 @@ export default function Home() {
     }
 
     const systemMessages = messages.filter(x => x.from === "System")
-    const otherMessages = messages.filter(x => x.from !== "System")
+    const publicMessages = messages.filter(x => x.from !== "System" && x.type === "public")
+    const privateMessages = messages.filter(x => x.from !== "System" && x.type === "private")
 
     return (
         <>
@@ -103,21 +117,34 @@ export default function Home() {
             <button>Send</button>
         </form>
         <div id="contents">
-            <MessageList messages={systemMessages} nickname={nickname}/>
-            <MessageList messages={otherMessages} nickname={nickname} />    
+            <MessageList messages={systemMessages} nickname={nickname} title="System"/>
+            <MessageList messages={publicMessages} nickname={nickname} title="Public"/> 
+            <MessageList messages={privateMessages} nickname={nickname} title="Private"/>     
             <UserList />                    
         </div>
         </>
     )
 }
 
-function MessageList({messages, nickname}) {
+function MessageList({messages, nickname, title}) {
+    const privateMessage = (msg) => {
+        const content =
+        msg.from === nickname ?
+        `[To: ${msg.to}] ${msg.message}` :
+        `[From: ${msg.from}] ${msg.message}`;
+        return content;
+    }
+
     const renderItem = (index, key) => {
         let attribute = messages[index].from === nickname ? ' me' : (index % 2 ? '' : ' even')
         attribute = index === 0 ? ' top' : attribute
+        let content = messages[index].from !== 'System' && messages[index].type === 'private' ?
+            privateMessage(messages[index]) :
+            `[${messages[index].from}] ${messages[index].message}`
+
         return( 
         <div key={key} class= {"listitem" + attribute}>
-            [{messages[index].from}] {messages[index].message} 
+            {content} 
             <div class="time">
                 {messages[index].time}
             </div>
@@ -127,6 +154,7 @@ function MessageList({messages, nickname}) {
 
     return (
         <div>
+            <div>{title}</div>
             <div id="messageList" style={{overflow: 'auto', maxHeight: 400}}>
                 <ReactList
                     itemRenderer={renderItem}
