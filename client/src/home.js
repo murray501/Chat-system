@@ -3,16 +3,18 @@ import { io } from "socket.io-client";
 import { useInput } from "./hooks";
 import "./index.css";
 import ReactList from 'react-list';
+import Select from 'react-select';
 
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
-    const [socket, setSocket] = useState();
-    const [nickname, setNickname] = useState("");
     const [messages, setMessage] = useReducer(
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
-    const [userlist, setUserlist] = useState([]);
+    const [useroptions, setUserOptions] = useState([]);
+    const [nickname, setNickname] = useState("");
+    const [socket, setSocket] = useState();
+    const [once, setOnce] = useState(true);
 
     const submit = e => {
         e.preventDefault();
@@ -30,21 +32,32 @@ export default function Home() {
         socket.on('chat message', msg => {
             setMessage(msg);
         })
+        
         socket.on('user list', _userlist => {
             const userlist = _userlist.userlist;
-            console.log("userlist from socket " + userlist.length);
-            let nickname = prompt("please enter your name","Harry Potter");
-            while (nickname === "" || userlist.includes(nickname)) {
-               nickname = prompt(nickname + " is used or empty. Please enter valid name.","Harry Potter");
+            const initial = [{value: 'all', label: 'all'}];
+            const options = userlist.map(x => {
+                return {value: x, label: x}
+            })
+            const options2 = initial.concat(options);
+            setUserOptions(options2);
+
+            if (once) {
+                setOnce(false);
+                let nkname = prompt("please enter your name","Harry Potter");
+                
+                while (!nkname || userlist.includes(nkname) || nkname === 'all') {
+                    nkname = prompt("name is used or empty. please enter other name", "Harry Potter");
+                }
+                
+                socket.emit('enter name', nkname);
+                setNickname(nkname);
             }
-            socket.emit('enter name', nickname);
-            setNickname(nickname);    
-            setUserlist(userlist);
-        })
-        setSocket(socket)
+        }) 
+        setSocket(socket);
     }, [])
 
-    if (nickname === "" || userlist.includes(nickname)) {
+    if (!nickname) {
         return (
         <p>loading...</p>
         );
@@ -66,44 +79,22 @@ export default function Home() {
         </form>
         <div id="contents">
             <MessageList messages={systemMessages} nickname={nickname}/>
-            <MessageList messages={otherMessages} nickname={nickname} />   
-            <UserList userlist={userlist}/>         
+            <MessageList messages={otherMessages} nickname={nickname} />    
+            <UserList useroptions={useroptions}/>                    
         </div>
         </>
     )
 }
 
-function UserList({userlist}) {
-    if (userlist.length === 0) {
-        return (
-            <div>
-                No user is found.
-            </div>
-        )
-    }
-
-    const renderItem = (index, key) => {
-        return(  
-            <div class="userlistItem">
-            <button>
-                {userlist[index]}
-            </button>
-            </div>
-        )
-    }
-
+function UserList({useroptions}) {
     return (
-        <div>
-            <div id="userList" style={{overflow: 'auto', maxHeight: 400}}>
-                <ReactList
-                    itemRenderer={renderItem}
-                    length={userlist.length}
-                    type='uniform'
-                />
-            </div>
+        <div id="userList">
+            <Select
+                defaultValue={useroptions[0]}
+                options={useroptions}
+            /> 
         </div>
     )
-
 }
 
 function MessageList({messages, nickname}) {
