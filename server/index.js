@@ -26,13 +26,13 @@ io.on('connection', (socket) => {
     socket.on('enter name', name => {
         usermap.set(socket.id, name)
         socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
-        socket.broadcast.emit('chat message', {from: 'System', message: name + ' is entered.', time: current()});
+        socket.broadcast.emit('enter', {who: name, time: current()});
     })
     socket.on('chat message', (msg) => {
         socket.broadcast.emit('chat message', {...msg, time: current()});
     })
     socket.on('disconnect', () => {
-        socket.broadcast.emit('chat message', {from: 'System', message: getName(socket) + ' is leaving.', time: current()});
+        socket.broadcast.emit('leave', {who: getName(socket), time: current()});
     })
 });
 

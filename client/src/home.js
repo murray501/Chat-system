@@ -11,10 +11,11 @@ export default function Home() {
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
-    const [useroptions, setUserOptions] = useState([]);
+    const [useroptions, setUserOptions] = useState([{value: 'all', label: 'all'}]);
     const [nickname, setNickname] = useState("");
     const [socket, setSocket] = useState();
     const [once, setOnce] = useState(true);
+    const [useroption, setUserOption] = useState(useroptions[0]);
 
     const submit = e => {
         e.preventDefault();
@@ -22,6 +23,18 @@ export default function Home() {
         socket.emit('chat message', messageObj);
         setMessage(messageObj);
         resetMessage();
+    }
+
+    function UserList() {
+        return (
+            <div id="userList">
+                <Select
+                    defaultValue={useroption}
+                    options={useroptions}
+                    onChange={setUserOption}
+                /> 
+            </div>
+        )
     }
 
     useEffect(() => {
@@ -32,26 +45,38 @@ export default function Home() {
         socket.on('chat message', msg => {
             setMessage(msg);
         })
-        
+        socket.on('enter', msg => {
+            const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
+            setMessage(message);
+            let newOptions = [...useroptions, {value: msg.who, label: msg.who}];
+            setUserOptions(newOptions);
+        })
+        socket.on('leave', msg => {
+            const message= {from: 'System', message: msg.who + " is leaving.", time: msg.time}
+            setMessage(message);
+            let newOptions = useroptions.filter(x => x.value !== msg.who);
+            setUserOptions(newOptions);
+        })
         socket.on('user list', _userlist => {
-            const userlist = _userlist.userlist;
-            const initial = [{value: 'all', label: 'all'}];
-            const options = userlist.map(x => {
-                return {value: x, label: x}
-            })
-            const options2 = initial.concat(options);
-            setUserOptions(options2);
-
             if (once) {
-                setOnce(false);
+                setOnce(false); 
+                const userlist = _userlist.userlist;
+                const options = userlist.map(x => {
+                    return {value: x, label: x}
+                })
+                const options2 = useroptions.concat(options);
+                setUserOptions(options2);
+
                 let nkname = prompt("please enter your name","Harry Potter");
                 
                 while (!nkname || userlist.includes(nkname) || nkname === 'all') {
                     nkname = prompt("name is used or empty. please enter other name", "Harry Potter");
                 }
                 
-                socket.emit('enter name', nkname);
-                setNickname(nkname);
+                if (nkname) {
+                    socket.emit('enter name', nkname);
+                    setNickname(nkname);
+                }
             }
         }) 
         setSocket(socket);
@@ -80,20 +105,9 @@ export default function Home() {
         <div id="contents">
             <MessageList messages={systemMessages} nickname={nickname}/>
             <MessageList messages={otherMessages} nickname={nickname} />    
-            <UserList useroptions={useroptions}/>                    
+            <UserList />                    
         </div>
         </>
-    )
-}
-
-function UserList({useroptions}) {
-    return (
-        <div id="userList">
-            <Select
-                defaultValue={useroptions[0]}
-                options={useroptions}
-            /> 
-        </div>
     )
 }
 
