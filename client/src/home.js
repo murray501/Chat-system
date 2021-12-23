@@ -47,6 +47,7 @@ export default function Home() {
 
     useEffect(() => {
         const socket = io("http://localhost:5000");
+        let nkname;
         socket.on("connect", () => {
             console.log(socket.id);
         })
@@ -56,31 +57,35 @@ export default function Home() {
         socket.on('enter', msg => {
             const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
             setMessage(message);
-            console.log("before->" + JSON.stringify(useroptions));
-            let newData = [...useroptions];
-            newData.push({value: msg.who, label: msg.who});
-            console.log("newData = " + JSON.stringify(newData));
-            setUserOptions([...newData]);
-            console.log(msg.who + " is entered.");
-            console.log("after->" + JSON.stringify(useroptions));
         })
         socket.on('leave', msg => {
             const message= {from: 'System', message: msg.who + " is leaving.", time: msg.time}
             setMessage(message);
-            let newOptions = useroptions.filter(x => x.value !== msg.who);
+        })
+        socket.on('user list update', _userlist => {
+            const userlist = _userlist.userlist;
+            let options = userlist.map(x => {
+                return {value: x, label: x}
+            })
+            options = options.filter(x => x.value !== nkname);
+            const init = [{value: 'all', label: 'all'}];
+            const newOptions = init.concat(options);
             setUserOptions(newOptions);
+            setUserOption(newOptions[0]);
         })
         socket.on('user list', _userlist => {
             if (once) {
-                setOnce(false); 
+                setOnce(false);
                 const userlist = _userlist.userlist;
-                const options = userlist.map(x => {
+                let options = userlist.map(x => {
                     return {value: x, label: x}
                 })
-                const options2 = useroptions.concat(options);
-                setUserOptions(options2);
-
-                let nkname = prompt("please enter your name","Harry Potter");
+                const init = [{value: 'all', label: 'all'}];
+                const newOptions = init.concat(options);
+                setUserOptions(newOptions);
+                setUserOption(newOptions[0]);
+    
+                nkname = prompt("please enter your name","Harry Potter");
                 
                 while (!nkname || userlist.includes(nkname) || nkname === 'all') {
                     nkname = prompt("name is used or empty. please enter other name", "Harry Potter");

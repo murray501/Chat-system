@@ -39,6 +39,7 @@ io.on('connection', (socket) => {
         usermap.set(socket.id, {user: name, soc: socket});
         socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
         socket.broadcast.emit('enter', {who: name, time: current()});
+        socket.broadcast.emit('user list update', {userlist: getUserList()});
     })
     socket.on('chat message', (msg) => {
         if (msg.type === 'public') {
@@ -52,7 +53,9 @@ io.on('connection', (socket) => {
     })
     socket.on('disconnect', () => {
         const who = getName(socket);
+        usermap.delete(socket.id);
         socket.broadcast.emit('leave', {who: who, time: current()});
+        socket.broadcast.emit('user list update', {userlist: getUserList()});
     })
 });
 
