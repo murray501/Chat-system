@@ -21,6 +21,7 @@ export default function Home() {
     const [socket, setSocket] = useState();
     const [once, setOnce] = useState(true);
     const [useroption, setUserOption] = useState();
+    const [avatar, setAvatar] = useState();
 
     const messageType = () => {
         if (!useroptions || !useroption) {
@@ -65,6 +66,12 @@ export default function Home() {
         })
         socket.on('chat message', msg => {
             setMessage(msg);
+        })
+        socket.on('welcome', msg => {
+            const message = {from: 'System', message: `Welcome! ${nkname}.`, time: msg.time};
+            setMessage(message);
+            setAvatar(msg.avatar);
+            console.log("avatar = " + msg.avatar);
         })
         socket.on('enter', msg => {
             const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
@@ -130,8 +137,16 @@ export default function Home() {
         <div id="contents">
             <MessageList messages={systemMessages} nickname={nickname} title="System"/>
             <MessageList messages={publicMessages} nickname={nickname} title="Public"/> 
-            <MessageList messages={privateMessages} nickname={nickname} title="Private"/>     
-            <UserList />                    
+            <MessageList messages={privateMessages} nickname={nickname} title="Private"/>
+            <div>
+                <UserList />
+                <div id="profile">
+                    <div>{nickname}</div>
+                    <div>
+                        <img src={avatar} width="100" height="auto"/>
+                    </div>
+                </div>
+            </div>                     
         </div>
         </>
     )

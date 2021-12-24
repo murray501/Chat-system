@@ -16,6 +16,16 @@ body { margin: 10;
   backdrop-filter: blur(10px);
 }
 
+#profile {
+  background: rgba(236, 240, 6, 0.15);
+  padding:  10px;
+  position: fixed;
+  bottom: 4rem;
+  right: 10px;
+  box-sizing: border-box;
+  text-align: center
+}
+
 #input {
   border: none;
   padding: 0 1rem;

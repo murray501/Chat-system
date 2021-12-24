@@ -4,6 +4,7 @@ const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const dayjs = require('dayjs')
+require('isomorphic-fetch');
 
 const io = new Server(server, {
     cors: {
@@ -33,17 +34,27 @@ const current = () => {
     return dayjs().format();
 }
 
+const getImage = (socket, username) => {
+    fetch('https://dog.ceo/api/breeds/image/random')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const avatar = data.message;
+                socket.emit('welcome',{avatar: avatar, time: current()});
+                usermap.set(socket.id, {user: username, soc: socket, avatar: avatar});
+                socket.broadcast.emit('enter', {who: username, time: current()});
+                socket.broadcast.emit('user list update', {userlist: getUserList()});
+            }
+        })
+        .catch(console.error);
+}
+
 io.on('connection', (socket) => {
     socket.emit('user list', {userlist: getUserList()});
-    socket.on('enter name', name => {
-        usermap.set(socket.id, {user: name, soc: socket});
-        socket.emit('chat message',{from: 'System', message: 'Welcome ' + name + '.', time: current()});
-        socket.broadcast.emit('enter', {who: name, time: current()});
-        socket.broadcast.emit('user list update', {userlist: getUserList()});
+    socket.on('enter name', username => {
+        getImage(socket, username);
     })
     socket.on('chat message', (msg) => {
-        console.log("---------------- received msg type = " + msg.type);
-        console.log("---------------- received msg = " + JSON.stringify(msg));
         if (msg.type === 'public') {
             socket.broadcast.emit('chat message', msg);
         } else {
