@@ -42,6 +42,8 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('user list update', {userlist: getUserList()});
     })
     socket.on('chat message', (msg) => {
+        console.log("---------------- received msg type = " + msg.type);
+        console.log("---------------- received msg = " + JSON.stringify(msg));
         if (msg.type === 'public') {
             socket.broadcast.emit('chat message', msg);
         } else {

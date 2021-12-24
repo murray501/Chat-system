@@ -22,13 +22,23 @@ export default function Home() {
     const [once, setOnce] = useState(true);
     const [useroption, setUserOption] = useState();
 
+    const messageType = () => {
+        if (!useroptions || !useroption) {
+            return 'public';
+        }
+        if (useroption.length === 0 || useroption.length === useroptions.length) {
+            return 'public';
+        }
+        return 'private';
+    }
+
     const submit = e => {
         e.preventDefault();
-        const multiTo = useroption?.map(x => x.value);
-        const messageType = (multiTo.length === 0 || multiTo.length === useroptions.length) ? 'public' : 'private'; 
-        const messageObj = (messageType === 'public') ?
-            {from: nickname, message: messageProps.value, type: messageType, time: current()}
-            : {from: nickname, to: multiTo, message: messageProps.value, type: messageType, time: current()}  
+        const type = messageType();
+        const multiTo = useroption?.map(x => x.value); 
+        const messageObj = (type === 'public') ?
+            {from: nickname, message: messageProps.value, type: type, time: current()}
+            : {from: nickname, to: multiTo, message: messageProps.value, type: type, time: current()}  
         socket.emit('chat message', messageObj);
         setMessage(messageObj);
         resetMessage();
