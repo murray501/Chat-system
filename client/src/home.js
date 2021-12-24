@@ -25,7 +25,7 @@ export default function Home() {
     const submit = e => {
         e.preventDefault();
         const multiTo = useroption?.map(x => x.value);
-        const messageType = multiTo.length === 0 ? 'public' : 'private'; 
+        const messageType = (multiTo.length === 0 || multiTo.length === useroptions.length) ? 'public' : 'private'; 
         const messageObj = (messageType === 'public') ?
             {from: nickname, message: messageProps.value, type: messageType, time: current()}
             : {from: nickname, to: multiTo, message: messageProps.value, type: messageType, time: current()}  
