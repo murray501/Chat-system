@@ -45,10 +45,12 @@ io.on('connection', (socket) => {
         if (msg.type === 'public') {
             socket.broadcast.emit('chat message', msg);
         } else {
-            const target = getSocket(msg.to);
-            if (target) {
-                target.emit('chat message', msg);
-            }
+            msg.to.forEach(username => {
+                const target = getSocket(username);
+                if (target) {
+                    target.emit('chat message', msg);
+                }
+            })
         }
     })
     socket.on('disconnect', () => {

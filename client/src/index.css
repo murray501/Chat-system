@@ -76,3 +76,7 @@ body { margin: 10;
   margin: 10px;
   width: 200px;
 }
+
+.title {
+  text-align: center;
+}

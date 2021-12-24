@@ -16,18 +16,19 @@ export default function Home() {
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
-    const [useroptions, setUserOptions] = useState([{value: 'all', label: 'all'}]);
+    const [useroptions, setUserOptions] = useState([]);
     const [nickname, setNickname] = useState("");
     const [socket, setSocket] = useState();
     const [once, setOnce] = useState(true);
-    const [useroption, setUserOption] = useState(useroptions[0]);
+    const [useroption, setUserOption] = useState();
 
     const submit = e => {
         e.preventDefault();
-        const messageType = (useroption.value === 'all') ? 'public' : 'private';
+        const multiTo = useroption?.map(x => x.value);
+        const messageType = multiTo.length === 0 ? 'public' : 'private'; 
         const messageObj = (messageType === 'public') ?
             {from: nickname, message: messageProps.value, type: messageType, time: current()}
-            : {from: nickname, to: useroption.value, message: messageProps.value, type: messageType, time: current()}  
+            : {from: nickname, to: multiTo, message: messageProps.value, type: messageType, time: current()}  
         socket.emit('chat message', messageObj);
         setMessage(messageObj);
         resetMessage();
@@ -37,6 +38,7 @@ export default function Home() {
         return (
             <div id="userList">
                 <Select
+                    isMulti
                     defaultValue={useroption}
                     options={useroptions}
                     onChange={setUserOption}
@@ -68,10 +70,7 @@ export default function Home() {
                 return {value: x, label: x}
             })
             options = options.filter(x => x.value !== nkname);
-            const init = [{value: 'all', label: 'all'}];
-            const newOptions = init.concat(options);
-            setUserOptions(newOptions);
-            setUserOption(newOptions[0]);
+            setUserOptions(options);
         })
         socket.on('user list', _userlist => {
             if (once) {
@@ -80,10 +79,7 @@ export default function Home() {
                 let options = userlist.map(x => {
                     return {value: x, label: x}
                 })
-                const init = [{value: 'all', label: 'all'}];
-                const newOptions = init.concat(options);
-                setUserOptions(newOptions);
-                setUserOption(newOptions[0]);
+                setUserOptions(options);
     
                 nkname = prompt("please enter your name","Harry Potter");
                 
@@ -159,7 +155,7 @@ function MessageList({messages, nickname, title}) {
 
     return (
         <div>
-            <div>{title}</div>
+            <div class='title'>{title}</div>
             <div id="messageList" style={{overflow: 'auto', maxHeight: 400}}>
                 <ReactList
                     itemRenderer={renderItem}
