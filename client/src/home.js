@@ -162,13 +162,6 @@ export default function Home() {
 }
 
 function MessageList({messages, nickname, title, userlist, avatar}) {
-    const privateMessage = (msg) => {
-        const content =
-        msg.from === nickname ?
-        `[To: ${msg.to}] ${msg.message}` :
-        `[From: ${msg.from}] ${msg.message}`;
-        return content;
-    }
 
     const attribute = (index) => {
         const msg = messages[index];
@@ -178,6 +171,9 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
     } 
 
     const getImage = (user) => {
+        if (user === nickname) {
+            return avatar;
+        }
         const target = userlist.find(x => x.user === user);
         if (target) {
             return target.avatar;
@@ -196,33 +192,33 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
                 </div>
             );
         } else if (msg.type === 'public') {
-            const image = (msg.from === nickname) ? avatar : getImage(msg.from); 
+            const image = getImage(msg.from); 
             return (
-                <div style={{display: "flex"}}>
-                    <div class="list-image">
-                        <img src={image} width="auto" height="50" />
-                    </div>
-                    <div style={{flex: 1}}>
-                        <p>
-                            [{msg.from}] {msg.message}
-                        </p>
-                        <p class="time">
-                            {msg.time}
-                        </p>
-                    </div>
+                <>
+                <div class="list-image">
+                    <img src={image} width="auto" height="30" />
+                    <span>[{msg.from}] {msg.message}</span>
                 </div>
+                <p class="time">{msg.time}</p>
+                </>
+            );
+        } else {
+            const image = msg.from === nickname ? '' : getImage(msg.from);
+            const content = msg.from === nickname ? 
+            `[To: ${msg.to}] ${msg.message}` :  `[From: ${msg.from}] ${msg.message}`;
+            return (
+                <>
+                <div class="list-image">
+                    <img src={image} width="auto" height="30" />
+                    <span>{content}</span>
+                </div>
+                <p class="time">{msg.time}</p>
+                </>
             );
         }
-        return (
-            <h1></h1>
-        );
     }
 
     const renderItem = (index, key) => {
-        let content = messages[index].from !== 'System' && messages[index].type === 'private' ?
-            privateMessage(messages[index]) :
-            `[${messages[index].from}] ${messages[index].message}`
-
         return( 
         <div key={key} class= {"listitem" + attribute(index)}>
             <Content index={index} /> 
