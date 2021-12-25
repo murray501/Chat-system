@@ -20,7 +20,9 @@ const getName = (socket) => {
 } 
 
 const getUserList = () => {
-    return [...usermap.values()].map(x => x.user);
+    return [...usermap.values()].map(x => {
+        return {user: x.user, avatar: x.avatar}
+    });
 }
 
 const getSocket = (username) => {
@@ -43,14 +45,14 @@ const getImage = (socket, username) => {
                 socket.emit('welcome',{avatar: avatar, time: current()});
                 usermap.set(socket.id, {user: username, soc: socket, avatar: avatar});
                 socket.broadcast.emit('enter', {who: username, time: current()});
-                socket.broadcast.emit('user list update', {userlist: getUserList()});
+                socket.broadcast.emit('user list update', getUserList());
             }
         })
         .catch(console.error);
 }
 
 io.on('connection', (socket) => {
-    socket.emit('user list', {userlist: getUserList()});
+    socket.emit('user list', getUserList());
     socket.on('enter name', username => {
         getImage(socket, username);
     })
@@ -70,7 +72,7 @@ io.on('connection', (socket) => {
         const who = getName(socket);
         usermap.delete(socket.id);
         socket.broadcast.emit('leave', {who: who, time: current()});
-        socket.broadcast.emit('user list update', {userlist: getUserList()});
+        socket.broadcast.emit('user list update', getUserList());
     })
 });
 

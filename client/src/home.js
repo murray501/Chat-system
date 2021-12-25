@@ -21,6 +21,7 @@ export default function Home() {
     const [socket, setSocket] = useState();
     const [once, setOnce] = useState(true);
     const [useroption, setUserOption] = useState();
+    const [userList, setUserList] = useState();
     const [avatar, setAvatar] = useState();
 
     const messageType = () => {
@@ -61,6 +62,22 @@ export default function Home() {
     useEffect(() => {
         const socket = io("http://localhost:5000");
         let nkname;
+
+        const setuserlist = userlist => {
+            let options = userlist.map(x => {
+                return {value: x.user, label: x.user}
+            })
+            if (nkname) {
+                options = options.filter(x => x.value !== nkname);
+            }
+            setUserOptions(options);
+            setUserList(userlist);
+        }
+
+        const contains = userlist => {
+            return userlist.map(x => x.user).includes(nkname);
+        }
+
         socket.on("connect", () => {
             console.log(socket.id);
         })
@@ -81,26 +98,18 @@ export default function Home() {
             const message= {from: 'System', message: msg.who + " is leaving.", time: msg.time}
             setMessage(message);
         })
-        socket.on('user list update', _userlist => {
-            const userlist = _userlist.userlist;
-            let options = userlist.map(x => {
-                return {value: x, label: x}
-            })
-            options = options.filter(x => x.value !== nkname);
-            setUserOptions(options);
+        socket.on('user list update', userlist => {
+            setuserlist(userlist);
         })
-        socket.on('user list', _userlist => {
+        socket.on('user list', userlist => {
             if (once) {
                 setOnce(false);
-                const userlist = _userlist.userlist;
-                let options = userlist.map(x => {
-                    return {value: x, label: x}
-                })
-                setUserOptions(options);
+
+                setuserlist(userlist);
     
                 nkname = prompt("please enter your name","Harry Potter");
                 
-                while (!nkname || userlist.includes(nkname) || nkname === 'all') {
+                while (!nkname || contains(userlist) || nkname === 'all') {
                     nkname = prompt("name is used or empty. please enter other name", "Harry Potter");
                 }
                 
@@ -135,9 +144,9 @@ export default function Home() {
             <button>Send</button>
         </form>
         <div id="contents">
-            <MessageList messages={systemMessages} nickname={nickname} title="System"/>
-            <MessageList messages={publicMessages} nickname={nickname} title="Public"/> 
-            <MessageList messages={privateMessages} nickname={nickname} title="Private"/>
+            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList}/>
+            <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList}/> 
+            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList}/>
             <div>
                 <UserList />
                 <div id="profile">
@@ -152,30 +161,55 @@ export default function Home() {
     )
 }
 
-function MessageList({messages, nickname, title}) {
-    const privateMessage = (msg) => {
-        const content =
-        msg.from === nickname ?
-        `[To: ${msg.to}] ${msg.message}` :
-        `[From: ${msg.from}] ${msg.message}`;
-        return content;
+function MessageList({messages, nickname, title, userlist}) {
+
+    const getImage = (user) => {
+        const target = userlist.find(x => x.user === user);
+        if (target) {
+            return target.avatar;
+        } else {
+            return '';
+        }
     }
 
-    const renderItem = (index, key) => {
-        let attribute = messages[index].from === nickname ? ' me' : (index % 2 ? '' : ' even')
+    function renderItem(index, key){
+        let msg = messages[index];
+        let attribute = msg.from === nickname ? ' me' : (index % 2 ? '' : ' even')
         attribute = index === 0 ? ' top' : attribute
-        let content = messages[index].from !== 'System' && messages[index].type === 'private' ?
-            privateMessage(messages[index]) :
-            `[${messages[index].from}] ${messages[index].message}`
 
-        return( 
-        <div key={key} class= {"listitem" + attribute}>
-            {content} 
-            <div class="time">
-                {messages[index].time}
-            </div>
-        </div>
-        )
+        if (msg.from === 'System') {
+            let content =  `[${msg.from}] ${msg.message}`
+            return( 
+                <div key={key} class= {"listitem" + attribute}>
+                    {content}
+                </div>
+            );
+        } else if (msg.type === 'private') {
+            let content;
+            let avatar;
+            if (msg.from === nickname) {
+                content = `[To: ${msg.to}] ${msg.message}`;
+                avatar = getImage(msg.to);
+            } else {
+                content =  `[From: ${msg.from}] ${msg.message}`;
+                avatar = getImage(msg.from);
+            }
+            return( 
+                <div key={key} class= {"listitem" + attribute}>
+                    <img src={avatar} width="auto" height="50"/>
+                    {content}
+                </div>
+            );
+        } else {
+            let content =  `[${msg.from}] ${msg.message}`
+            const avatar = getImage(msg.from);
+            return (
+                <div key={key} class= {"listitem" + attribute}>
+                    <img src={avatar} width="auto" height="50"/>
+                    {content}
+                </div> 
+            );
+        }
     }
 
     return (
