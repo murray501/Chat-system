@@ -144,9 +144,9 @@ export default function Home() {
             <button>Send</button>
         </form>
         <div id="contents">
-            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList}/>
-            <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList}/> 
-            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList}/>
+            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
+            <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
+            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>
             <div>
                 <UserList />
                 <div id="profile">
@@ -161,7 +161,21 @@ export default function Home() {
     )
 }
 
-function MessageList({messages, nickname, title, userlist}) {
+function MessageList({messages, nickname, title, userlist, avatar}) {
+    const privateMessage = (msg) => {
+        const content =
+        msg.from === nickname ?
+        `[To: ${msg.to}] ${msg.message}` :
+        `[From: ${msg.from}] ${msg.message}`;
+        return content;
+    }
+
+    const attribute = (index) => {
+        const msg = messages[index];
+        let attr = msg.from === nickname ? ' me' : (index % 2 ? '' : ' even')
+        attr = index === 0 ? ' top' : attr
+        return attr;
+    } 
 
     const getImage = (user) => {
         const target = userlist.find(x => x.user === user);
@@ -172,44 +186,48 @@ function MessageList({messages, nickname, title, userlist}) {
         }
     }
 
-    function renderItem(index, key){
-        let msg = messages[index];
-        let attribute = msg.from === nickname ? ' me' : (index % 2 ? '' : ' even')
-        attribute = index === 0 ? ' top' : attribute
-
+    function Content({index}) {
+        const msg = messages[index];
         if (msg.from === 'System') {
-            let content =  `[${msg.from}] ${msg.message}`
-            return( 
-                <div key={key} class= {"listitem" + attribute}>
-                    {content}
-                </div>
-            );
-        } else if (msg.type === 'private') {
-            let content;
-            let avatar;
-            if (msg.from === nickname) {
-                content = `[To: ${msg.to}] ${msg.message}`;
-                avatar = getImage(msg.to);
-            } else {
-                content =  `[From: ${msg.from}] ${msg.message}`;
-                avatar = getImage(msg.from);
-            }
-            return( 
-                <div key={key} class= {"listitem" + attribute}>
-                    <img src={avatar} width="auto" height="50"/>
-                    {content}
-                </div>
-            );
-        } else {
-            let content =  `[${msg.from}] ${msg.message}`
-            const avatar = getImage(msg.from);
             return (
-                <div key={key} class= {"listitem" + attribute}>
-                    <img src={avatar} width="auto" height="50"/>
-                    {content}
-                </div> 
+                <div>
+                    <p>{msg.message}</p>
+                    <p class="time">{msg.time}</p>
+                </div>
+            );
+        } else if (msg.type === 'public') {
+            const image = (msg.from === nickname) ? avatar : getImage(msg.from); 
+            return (
+                <div style={{display: "flex"}}>
+                    <div class="list-image">
+                        <img src={image} width="auto" height="50" />
+                    </div>
+                    <div style={{flex: 1}}>
+                        <p>
+                            [{msg.from}] {msg.message}
+                        </p>
+                        <p class="time">
+                            {msg.time}
+                        </p>
+                    </div>
+                </div>
             );
         }
+        return (
+            <h1></h1>
+        );
+    }
+
+    const renderItem = (index, key) => {
+        let content = messages[index].from !== 'System' && messages[index].type === 'private' ?
+            privateMessage(messages[index]) :
+            `[${messages[index].from}] ${messages[index].message}`
+
+        return( 
+        <div key={key} class= {"listitem" + attribute(index)}>
+            <Content index={index} /> 
+        </div>
+        )
     }
 
     return (

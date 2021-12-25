@@ -90,3 +90,8 @@ body { margin: 10;
 .title {
   text-align: center;
 }
+
+.list-image {
+  margin-top: 10px;
+  margin-right: 10px;
+}
