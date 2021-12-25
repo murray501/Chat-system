@@ -65,7 +65,9 @@ export default function Home() {
 
         const setuserlist = userlist => {
             let options = userlist.map(x => {
-                return {value: x.user, label: x.user}
+                return {value: x.user, 
+                        label: <div class='userlist-image'><img src={x.avatar} width="auto" height="30" /><span>{x.user}</span></div>
+                }
             })
             if (nkname) {
                 options = options.filter(x => x.value !== nkname);
@@ -186,10 +188,10 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
         const msg = messages[index];
         if (msg.from === 'System') {
             return (
-                <div>
-                    <p>{msg.message}</p>
-                    <p class="time">{msg.time}</p>
-                </div>
+                <>
+                    {msg.message}
+                    <div class="time">{msg.time}</div>
+                </>
             );
         } else if (msg.type === 'public') {
             const image = getImage(msg.from); 

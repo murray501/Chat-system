@@ -98,3 +98,8 @@ body { margin: 10;
   align-items: start;
   text-align: top;
 }
+
+.userlist-image {
+  display: flex;
+  align-items: center;
+}
