@@ -145,11 +145,11 @@ export default function Home() {
             />
             <button>Send</button>
         </form>
-        <div id="contents">
+        <div class="columns">
             <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
             <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
             <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>
-            <div>
+            <div class="column block">
                 <UserList />
                 <div id="profile">
                     <div>{nickname}</div>
@@ -197,11 +197,25 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
             const image = getImage(msg.from); 
             return (
                 <>
-                <div class="list-image">
-                    <img src={image} width="auto" height="30" />
-                    <span>[{msg.from}] {msg.message}</span>
-                </div>
-                <p class="time">{msg.time}</p>
+                    <article class="media">
+                        <div class="media-left">
+                            <figure class="image is-32x32">
+                                <img src={image} />
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    <strong>{msg.from}</strong>
+                                    <br/>
+                                    {msg.message}
+                                </p>
+                            </div>
+                            <div class="time">
+                                <p>{msg.time}</p>
+                            </div>
+                        </div>
+                    </article>
                 </>
             );
         } else {
@@ -229,8 +243,8 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
     }
 
     return (
-        <div>
-            <div class='title'>{title}</div>
+        <div class="column box">
+            <h1 class='title'>{title}</h1>
             <div id="messageList" style={{overflow: 'auto', maxHeight: 400}}>
                 <ReactList
                     itemRenderer={renderItem}

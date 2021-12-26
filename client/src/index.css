@@ -1,8 +1,3 @@
-body { margin: 10; 
-  padding-bottom: 3rem; 
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-}
-
 #form {
   background: rgba(0, 0, 0, 0.15);
   padding:  0.25rem;
@@ -49,15 +44,14 @@ body { margin: 10;
 }
 
 #messageList {
-  width: 400px;
-  margin: 10px;
+  width: 300px;
   box-shadow: 10px 10px 5px grey;
 }
 
 .listitem {
   background: linear-gradient(#fff, #eee);
   line-height: 30px;
-  padding: 0 10px;
+  padding: 10px;
 }
 
 .even {
@@ -77,11 +71,6 @@ body { margin: 10;
   font-size: 0.1rem;
 }
 
-#contents {
-  display: flex;
-  justify-content: space-around;
-}
-
 #userList {
   margin: 10px;
   width: 200px;
@@ -91,15 +80,4 @@ body { margin: 10;
   text-align: center;
 }
 
-.list-image {
-  display: flex;
-  padding-top: 5px;
-  padding-left: 5px;
-  align-items: start;
-  text-align: top;
-}
 
-.userlist-image {
-  display: flex;
-  align-items: center;
-}
