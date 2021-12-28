@@ -66,7 +66,18 @@ export default function Home() {
         const setuserlist = userlist => {
             let options = userlist.map(x => {
                 return {value: x.user, 
-                        label: <div class='userlist-image'><img src={x.avatar} width="auto" height="30" /><span>{x.user}</span></div>
+                        label: 
+                        <article class="media">
+                        <div class="media-left">
+                            <figure class="image is-32x32">
+                                <img src={x.avatar} />
+                            </figure>
+                        </div>
+                        <div class="media-content">
+                            {x.user}
+                        </div>
+                    </article>
+ 
                 }
             })
             if (nkname) {
@@ -136,6 +147,34 @@ export default function Home() {
 
     return (
         <>
+        <div class="columns section">
+            <div class="column is-2">
+            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
+            </div>
+            <div class="column is-4">
+                <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
+            </div>
+            <div class="column is-4">
+            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
+            </div>
+            <div class="column is-narrow">
+                <div class="box">
+                    <label class="label">Profile</label>
+                    <article class="media">
+                        <figure class="media-left">
+                            <img src={avatar} width="100" height="auto"/>
+                        </figure>
+                        <div class="media-content">
+                            {nickname}
+                        </div>
+                    </article>
+                </div>              
+                <div class="box">
+                    <label class="label">Select receivers.</label>
+                    <UserList />
+                </div>
+            </div>  
+        </div>
         <form id="form" onSubmit={submit}>
             <input id="input" autocomplete="off"
                 {...messageProps}
@@ -145,20 +184,6 @@ export default function Home() {
             />
             <button>Send</button>
         </form>
-        <div class="columns">
-            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
-            <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
-            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>
-            <div class="column block">
-                <UserList />
-                <div id="profile">
-                    <div>{nickname}</div>
-                    <div>
-                        <img src={avatar} width="100" height="auto"/>
-                    </div>
-                </div>
-            </div>                     
-        </div>
         </>
     )
 }
@@ -189,47 +214,54 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
         if (msg.from === 'System') {
             return (
                 <>
-                    {msg.message}
-                    <div class="time">{msg.time}</div>
+                {msg.message}
+                <div class="time">{msg.time}</div>
                 </>
             );
         } else if (msg.type === 'public') {
             const image = getImage(msg.from); 
             return (
-                <>
-                    <article class="media">
-                        <div class="media-left">
-                            <figure class="image is-32x32">
-                                <img src={image} />
-                            </figure>
+                <article class="media">
+                    <div class="media-left">
+                        <figure class="image is-32x32">
+                            <img src={image} />
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>{msg.from}</strong> <span class="time">{msg.time}</span>
+                                <br/>
+                                {msg.message}
+                            </p>
                         </div>
-                        <div class="media-content">
-                            <div class="content">
-                                <p>
-                                    <strong>{msg.from}</strong>
-                                    <br/>
-                                    {msg.message}
-                                </p>
-                            </div>
-                            <div class="time">
-                                <p>{msg.time}</p>
-                            </div>
-                        </div>
-                    </article>
-                </>
+                    </div>
+                </article>
             );
         } else {
             const image = msg.from === nickname ? '' : getImage(msg.from);
             const content = msg.from === nickname ? 
-            `[To: ${msg.to}] ${msg.message}` :  `[From: ${msg.from}] ${msg.message}`;
+            `[To: ${msg.to}] ${msg.message}` :  `${msg.message}`;
             return (
-                <>
-                <div class="list-image">
-                    <img src={image} width="auto" height="30" />
-                    <span>{content}</span>
-                </div>
-                <p class="time">{msg.time}</p>
-                </>
+                <article class="media">
+                    {image !== '' ? 
+                    (<div class="media-left">
+                        <figure class="image is-32x32">
+                            <img src={image} />
+                        </figure>
+                    </div>) : 
+                    null
+                    }
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>{msg.from}</strong> <span class="time">{msg.time}</span>
+                                <br/>
+                                {content}
+                            </p>
+                        </div>
+                    </div>
+                </article> 
             );
         }
     }
@@ -243,15 +275,15 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
     }
 
     return (
-        <div class="column box">
-            <h1 class='title'>{title}</h1>
-            <div id="messageList" style={{overflow: 'auto', maxHeight: 400}}>
+        <>
+            <p class="label">{title}</p>
+            <div style={{overflow: 'auto', maxHeight: 400}}>
                 <ReactList
                     itemRenderer={renderItem}
                     length={messages.length}
                     type='uniform'
                 />
             </div>
-        </div>
+        </>
     )
 }

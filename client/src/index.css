@@ -11,16 +11,6 @@
   backdrop-filter: blur(10px);
 }
 
-#profile {
-  background: rgba(236, 240, 6, 0.15);
-  padding:  10px;
-  position: fixed;
-  bottom: 4rem;
-  right: 10px;
-  box-sizing: border-box;
-  text-align: center
-}
-
 #input {
   border: none;
   padding: 0 1rem;
@@ -43,11 +33,6 @@
   color: #fff;
 }
 
-#messageList {
-  width: 300px;
-  box-shadow: 10px 10px 5px grey;
-}
-
 .listitem {
   background: linear-gradient(#fff, #eee);
   line-height: 30px;
@@ -67,17 +52,11 @@
 }
 
 .time {
+  font-size: 0.5rem;
   text-align: right;
-  font-size: 0.1rem;
 }
 
 #userList {
-  margin: 10px;
   width: 200px;
 }
-
-.title {
-  text-align: center;
-}
-
 
