@@ -69,7 +69,7 @@ export default function Home() {
                         label: 
                         <article class="media">
                         <div class="media-left">
-                            <figure class="image is-32x32">
+                            <figure class="image is-64x64">
                                 <img src={x.avatar} />
                             </figure>
                         </div>
@@ -145,56 +145,65 @@ export default function Home() {
     const publicMessages = messages.filter(x => x.from !== "System" && x.type === "public")
     const privateMessages = messages.filter(x => x.from !== "System" && x.type === "private")
 
+    function Notification() {
+        if (systemMessages.length > 0) {
+            return (
+                <div class="box">
+                    <label class="label">System Message</label>
+                    <p>
+                    {systemMessages[0].message}
+                    </p>
+                    <p class="time">{systemMessages[0].time}</p>
+                </div>
+            )
+        } else {
+            return <></>
+        }
+    }
+
     return (
         <>
         <div class="box">
-        <form onSubmit={submit}>
-            <div class="columns is-vcentered">
-                <div class="column">
-                    <UserList />
+            <form onSubmit={submit}>
+                <div class="columns">
+                    <div class="column is-narrow">
+                        <figure>
+                            <label class="label">{nickname}</label>
+                            <img src={avatar} width="100" height="auto"/>
+                        </figure>
+                    </div>     
+                    <div class="column">
+                        <label class="label">Write Message.</label>
+                        <textarea class="textarea" autocomplete="off" {...messageProps} placeholder="message..." required />
+                    </div>
+                    <div class="column is-narrow">
+                        <div class="field">
+                            <label class="label">Select Receivers.</label>
+                            <UserList />
+                        </div>
+                        <div class="field">
+                            <button class="button is-primary is-light">Send</button>
+                        </div>
+                    </div>
+                    <div class="colum is-2">
+                        <Notification />
+                    </div>
                 </div>
-                <div class="column is-9">
-                    <input class="input" autocomplete="off" {...messageProps} type="text" placeholder="message..." required />
-                </div>
-                <div class="column">
-                    <button class="button is-primary is-light">Send</button>
-                </div>
-            </div>
-        </form>
+            </form>
         </div>
-        <div class="section">
         <div class="columns">
-            <div class="column is-2">
-            <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
-            </div>
-            <div class="column">
+            <div class="column is-6">
                 <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
             </div>
-            <div class="column">
-            <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
+            <div class="column is-6">
+                <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
             </div>
-            <div class="column is-narrow">
-                <div class="box">
-                    <label class="label">{nickname}</label>
-                    <figure class="media-left">
-                        <img src={avatar} width="100" height="auto"/>
-                    </figure>
-                </div>          
-            </div>
-        </div>
         </div>
         </>
     )
 }
 
 function MessageList({messages, nickname, title, userlist, avatar}) {
-
-    const attribute = (index) => {
-        const msg = messages[index];
-        let attr = msg.from === nickname ? ' me' : (index % 2 ? '' : ' even')
-        attr = index === 0 ? ' top' : attr
-        return attr;
-    } 
 
     const getImage = (user) => {
         if (user === nickname) {
@@ -221,11 +230,11 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
             const image = getImage(msg.from); 
             return (
                 <article class="media">
-                    <div class="media-left">
-                        <figure class="image is-32x32">
+                    <figure class="media-left">
+                        <p class="image is-32x32">
                             <img src={image} />
-                        </figure>
-                    </div>
+                        </p>
+                    </figure>
                     <div class="media-content">
                         <div class="content">
                             <p>
@@ -244,11 +253,11 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
             return (
                 <article class="media">
                     {image !== '' ? 
-                    (<div class="media-left">
-                        <figure class="image is-32x32">
+                    (<figure class="media-left">
+                        <p class="image is-32x32">
                             <img src={image} />
-                        </figure>
-                    </div>) : 
+                        </p>
+                    </figure>) : 
                     null
                     }
                     <div class="media-content">
@@ -265,24 +274,14 @@ function MessageList({messages, nickname, title, userlist, avatar}) {
         }
     }
 
-    const renderItem = (index, key) => {
-        return( 
-        <div key={key} class= {"listitem" + attribute(index)}>
-            <Content index={index} /> 
-        </div>
-        )
-    }
-
     return (
-        <>
-            <p class="label">{title}</p>
-            <div style={{overflow: 'auto', maxHeight: 400}}>
-                <ReactList
-                    itemRenderer={renderItem}
-                    length={messages.length}
-                    type='uniform'
-                />
-            </div>
-        </>
+        <div class="box">
+            <label class="label">{title}</label>
+            {
+                messages.map((msg, index) => {
+                    return (<Content index={index} />)
+                })
+            }
+        </div>
     )
 }
