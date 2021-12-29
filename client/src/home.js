@@ -147,43 +147,41 @@ export default function Home() {
 
     return (
         <>
-        <form class="box" onSubmit={submit}>
-            <div class="field"> 
-                <lavel class="label">Message</lavel>
-                <input class="input is-8" autocomplete="off" {...messageProps} type="text" placeholder="message..." required />
-            </div>
-            <div class="field">
-                <button class="button is-primary is-light">Send</button>
+        <div class="box">
+        <form onSubmit={submit}>
+            <div class="columns is-vcentered">
+                <div class="column">
+                    <UserList />
+                </div>
+                <div class="column is-9">
+                    <input class="input" autocomplete="off" {...messageProps} type="text" placeholder="message..." required />
+                </div>
+                <div class="column">
+                    <button class="button is-primary is-light">Send</button>
+                </div>
             </div>
         </form>
-    
-        <div class="columns section">
+        </div>
+        <div class="section">
+        <div class="columns">
             <div class="column is-2">
             <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
             </div>
-            <div class="column is-4">
+            <div class="column">
                 <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
             </div>
-            <div class="column is-4">
+            <div class="column">
             <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
             </div>
             <div class="column is-narrow">
                 <div class="box">
-                    <label class="label">Profile</label>
-                    <article class="media">
-                        <figure class="media-left">
-                            <img src={avatar} width="100" height="auto"/>
-                        </figure>
-                        <div class="media-content">
-                            {nickname}
-                        </div>
-                    </article>
-                </div>              
-                <div class="box">
-                    <label class="label">Select receivers.</label>
-                    <UserList />
-                </div>
-            </div>  
+                    <label class="label">{nickname}</label>
+                    <figure class="media-left">
+                        <img src={avatar} width="100" height="auto"/>
+                    </figure>
+                </div>          
+            </div>
+        </div>
         </div>
         </>
     )
