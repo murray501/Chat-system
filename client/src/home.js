@@ -147,6 +147,16 @@ export default function Home() {
 
     return (
         <>
+        <form class="box" onSubmit={submit}>
+            <div class="field"> 
+                <lavel class="label">Message</lavel>
+                <input class="input is-8" autocomplete="off" {...messageProps} type="text" placeholder="message..." required />
+            </div>
+            <div class="field">
+                <button class="button is-primary is-light">Send</button>
+            </div>
+        </form>
+    
         <div class="columns section">
             <div class="column is-2">
             <MessageList messages={systemMessages} nickname={nickname} title="System" userlist={userList} avatar={avatar}/>
@@ -175,15 +185,6 @@ export default function Home() {
                 </div>
             </div>  
         </div>
-        <form id="form" onSubmit={submit}>
-            <input id="input" autocomplete="off"
-                {...messageProps}
-                type="text"
-                placeholder="message..."
-                required
-            />
-            <button>Send</button>
-        </form>
         </>
     )
 }
