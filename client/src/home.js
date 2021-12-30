@@ -2,7 +2,6 @@ import React, { useState, useEffect, useReducer } from "react";
 import { io } from "socket.io-client";
 import { useInput } from "./hooks";
 import "./index.css";
-import ReactList from 'react-list';
 import Select from 'react-select';
 const dayjs = require('dayjs');
 
@@ -153,49 +152,25 @@ export default function Home() {
     function Notification() {
         if (systemMessages.length > 0) {
             return (
-                <div class="box">
-                    <label class="label">System Message</label>
-                    <p>
-                    {systemMessages[0].message}
-                    </p>
-                    <p class="time">{systemMessages[0].time}</p>
-                </div>
+                <article class="message is-primary">
+                    <div class="message-header">
+                        <p>System Message</p>
+                    </div>
+                    <div class="message-body">
+                        <p>
+                            {systemMessages[0].message}
+                        </p>
+                        <p class="time">{systemMessages[0].time}</p>
+                    </div>
+                </article>
             )
         } else {
             return <></>
         }
     }
 
-    return (
-        <>
-        <div class="box">
-            <form onSubmit={submit}>
-                <div class="columns">
-                    <div class="column is-narrow">
-                        <figure>
-                            <label class="label">{nickname}</label>
-                            <img src={avatar} width="100" height="auto"/>
-                        </figure>
-                    </div>     
-                    <div class="column">
-                        <label class="label">Write Message.</label>
-                        <textarea class="textarea" autocomplete="off" {...messageProps} placeholder="message..." required />
-                    </div>
-                    <div class="column is-2">
-                        <div class="field">
-                            <label class="label">Select Receivers.</label>
-                            <UserSelect />
-                        </div>
-                        <div class="field">
-                            <button class="button is-primary is-light">Send</button>
-                        </div>
-                    </div>
-                    <div class="colum is-2">
-                        <Notification />
-                    </div>
-                </div>
-            </form>
-        </div>
+    function Lower() {
+        return (
         <div class="columns">
             <div class="column is-5">
                 <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
@@ -204,12 +179,48 @@ export default function Home() {
                 <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
             </div>
             <div class="column is-2">
-                <label class="label">Users</label>
-                <UserList />
+                <div class="box">
+                    <label class="label">Users</label>
+                    <UserList />
+                </div>
             </div>
         </div>
-        </>
-    )
+        );
+    }
+
+    return (
+        <div class="container">
+            <div class="box">
+                <form onSubmit={submit}>
+                    <div class="columns is-vcentered">
+                        <div class="column is-narrow">
+                            <figure class="has-text-centered">
+                                <label class="label">{nickname}</label>
+                                <img src={avatar} width="100" height="auto"/>
+                            </figure>
+                        </div>     
+                        <div class="column">
+                            <label class="label">Write Message.</label>
+                            <textarea class="textarea" autocomplete="off" {...messageProps} placeholder="message..." required />
+                        </div>
+                        <div class="column is-2">
+                            <div class="field">
+                                <label class="label">Select Receivers.</label>
+                                <UserSelect />
+                            </div>
+                            <div class="field">
+                                <button class="button is-primary is-light">Send</button>
+                            </div>
+                        </div>
+                        <div class="colum is-2">
+                            <Notification />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <Lower />
+        </div>
+    );
 }
 
 function MessageList({messages, nickname, title, userlist, avatar}) {
