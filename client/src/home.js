@@ -46,16 +46,34 @@ export default function Home() {
         resetMessage();
     }
 
-    function UserList() {
+    function UserSelect() {
+        const userlist = (nickname) ? 
+        userList.filter(x => x.user !== nickname) : userList
+    
         return (
-            <div id="userList">
                 <Select
                     isMulti
                     defaultValue={useroption}
                     options={useroptions}
                     onChange={setUserOption}
                 /> 
-            </div>
+        )
+    }
+
+    function UserList() {
+        const userlist = (nickname) ? 
+            userList.filter(x => x.user !== nickname) : userList
+        return (
+            <>
+                {userlist.map(x => {
+                    return (
+                        <figure>
+                            <label class="label">{x.user}</label>
+                            <img src={x.avatar} width="100" height="auto" />
+                        </figure>
+                    )
+                })}
+            </>           
         )
     }
 
@@ -65,20 +83,7 @@ export default function Home() {
 
         const setuserlist = userlist => {
             let options = userlist.map(x => {
-                return {value: x.user, 
-                        label: 
-                        <article class="media">
-                        <div class="media-left">
-                            <figure class="image is-64x64">
-                                <img src={x.avatar} />
-                            </figure>
-                        </div>
-                        <div class="media-content">
-                            {x.user}
-                        </div>
-                    </article>
- 
-                }
+                return {value: x.user, label: x.user}
             })
             if (nkname) {
                 options = options.filter(x => x.value !== nkname);
@@ -176,10 +181,10 @@ export default function Home() {
                         <label class="label">Write Message.</label>
                         <textarea class="textarea" autocomplete="off" {...messageProps} placeholder="message..." required />
                     </div>
-                    <div class="column is-narrow">
+                    <div class="column is-2">
                         <div class="field">
                             <label class="label">Select Receivers.</label>
-                            <UserList />
+                            <UserSelect />
                         </div>
                         <div class="field">
                             <button class="button is-primary is-light">Send</button>
@@ -192,11 +197,15 @@ export default function Home() {
             </form>
         </div>
         <div class="columns">
-            <div class="column is-6">
+            <div class="column is-5">
                 <MessageList messages={publicMessages} nickname={nickname} title="Public" userlist={userList} avatar={avatar}/> 
             </div>
-            <div class="column is-6">
+            <div class="column is-5">
                 <MessageList messages={privateMessages} nickname={nickname} title="Private" userlist={userList} avatar={avatar}/>    
+            </div>
+            <div class="column is-2">
+                <label class="label">Users</label>
+                <UserList />
             </div>
         </div>
         </>

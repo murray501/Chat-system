@@ -1,27 +1,4 @@
-.listitem {
-  background: linear-gradient(#fff, #eee);
-  line-height: 30px;
-  padding: 10px;
-}
-
-.even {
-  background: linear-gradient(#ddd, #ccc);
-}
-
-.top {
-  background: linear-gradient(#fff, #ffa07a);
-}
-
-.me {
-  background: linear-gradient(#fff, #4caa0e);
-}
-
 .time {
   font-size: 0.5rem;
   text-align: right;
 }
-
-#userList {
-  width: 200px;
-}
-
