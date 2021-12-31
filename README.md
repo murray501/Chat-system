@@ -20,7 +20,7 @@ To get dog's photo, `Dog API`(https://dog.ceo/api/breeds/image/random) is used.
 
 ### Client
 `react` is used.
-To make CSS, `bulma` is used.
+To work on CSS, `bulma` is used.
 
 
 
