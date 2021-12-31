@@ -1,2 +1,16 @@
-# glowing-waffle
-project learning NodeJS and React
+# Chat system 
+`option 1`. using directiory `server` and `client`.
+## How to run ? (option 1)
+1. cd server
+2. npm start  -> server run (http://localhost:5000)
+3. cd client
+4. npm start -> client run (http://localhost:3000)
+5. In the browser, enter username.
+6. Then chat screen shows up.
+7. enter message. click send button.
+8. choose receivers.
+9. Messages are grouped by `public` or `private`.
+
+
+
+
