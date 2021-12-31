@@ -42,7 +42,7 @@ const getImage = (socket, username) => {
         .then(data => {
             if (data.status === 'success') {
                 const avatar = data.message;
-                socket.emit('welcome',{avatar: avatar, time: current()});
+                socket.emit('welcome',{avatar: avatar, user: username, time: current()});
                 usermap.set(socket.id, {user: username, soc: socket, avatar: avatar});
                 socket.broadcast.emit('enter', {who: username, time: current()});
                 socket.broadcast.emit('user list update', getUserList());

@@ -11,6 +11,7 @@ const current = () => {
 
 export default function Home() {
     const [messageProps, resetMessage] = useInput("");
+    const [nicknameProps, resetNickname] = useInput("");
     const [messages, setMessage] = useReducer(
         (messages, newMessage) => [newMessage, ...messages],
         []
@@ -18,7 +19,7 @@ export default function Home() {
     const [useroptions, setUserOptions] = useState([]);
     const [nickname, setNickname] = useState("");
     const [socket, setSocket] = useState();
-    const [once, setOnce] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
     const [useroption, setUserOption] = useState();
     const [userList, setUserList] = useState();
     const [avatar, setAvatar] = useState();
@@ -45,10 +46,35 @@ export default function Home() {
         resetMessage();
     }
 
+    const contains = nkname => {
+        return userList.map(x => x.user).includes(nkname);
+    }
+
+    const submitName = e => {
+        e.preventDefault();
+        const nkname = nicknameProps.value;
+        if (contains(nkname)) {
+            setErrorMessage("Name is used. please enter different name.");
+            resetNickname();
+        } else{
+            socket.emit('enter name', nkname);
+            setNickname(nkname);
+        }
+    }
+
+    const setuserlist = (newlist, nkname) => {
+        console.log("newlist = " + newlist);
+        console.log("nickname = " + nkname);
+        newlist = newlist.filter(x => x.user !== nkname);
+
+        let options = newlist.map(x => {
+            return {value: x.user, label: x.user}
+        })
+        setUserOptions(options);
+        setUserList(newlist);
+    }
+
     function UserSelect() {
-        const userlist = (nickname) ? 
-        userList.filter(x => x.user !== nickname) : userList
-    
         return (
                 <Select
                     isMulti
@@ -78,22 +104,7 @@ export default function Home() {
 
     useEffect(() => {
         const socket = io("http://localhost:5000");
-        let nkname;
-
-        const setuserlist = userlist => {
-            let options = userlist.map(x => {
-                return {value: x.user, label: x.user}
-            })
-            if (nkname) {
-                options = options.filter(x => x.value !== nkname);
-            }
-            setUserOptions(options);
-            setUserList(userlist);
-        }
-
-        const contains = userlist => {
-            return userlist.map(x => x.user).includes(nkname);
-        }
+        const nkname = "";
 
         socket.on("connect", () => {
             console.log(socket.id);
@@ -102,10 +113,10 @@ export default function Home() {
             setMessage(msg);
         })
         socket.on('welcome', msg => {
-            const message = {from: 'System', message: `Welcome! ${nkname}.`, time: msg.time};
+            const message = {from: 'System', message: `Welcome! ${msg.user}.`, time: msg.time};
             setMessage(message);
             setAvatar(msg.avatar);
-            console.log("avatar = " + msg.avatar);
+            nkname = msg.user;
         })
         socket.on('enter', msg => {
             const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
@@ -116,32 +127,46 @@ export default function Home() {
             setMessage(message);
         })
         socket.on('user list update', userlist => {
-            setuserlist(userlist);
+            setuserlist(userlist, nkname);
         })
         socket.on('user list', userlist => {
-            if (once) {
-                setOnce(false);
-
-                setuserlist(userlist);
-    
-                nkname = prompt("please enter your name","Harry Potter");
-                
-                while (!nkname || contains(userlist) || nkname === 'all') {
-                    nkname = prompt("name is used or empty. please enter other name", "Harry Potter");
-                }
-                
-                if (nkname) {
-                    socket.emit('enter name', nkname);
-                    setNickname(nkname);
-                }
-            }
-        }) 
+            setuserlist(userlist, nkname);
+        })
         setSocket(socket);
     }, [])
 
+    if (userList === null) {
+        return <div>Loading...</div>
+    }
+
     if (!nickname) {
         return (
-        <p>loading...</p>
+            <section class="hero is-info is-fullheight">
+                <div class="hero-body">
+                    <div class="container">
+                        <div class="columns">
+                            <div class="column">
+                                <form onSubmit={submitName} class="box">
+                                    <div class="field">
+                                        <label class="label">Please enter your name</label>
+                                        <input class="input" type="text" {...nicknameProps} placeholder="e.g. Harry Potter" required /> 
+                                    </div>
+                                    <div class="field">
+                                        <button class="button is-success">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </form>
+                                {
+                                    errorMessage ? 
+                                        <div class="tag is-warning is-large">{errorMessage}</div> :
+                                        <></>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         );
     }
 
