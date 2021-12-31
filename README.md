@@ -11,6 +11,15 @@ option 1:  using directiory `server` and `client`.
 8. Can choose multiple receivers.
 9. Messages are grouped by `public` or `private`.
 
+## What are implemented ? (option1)
+`socket.io` is used for communication between server and client.
+
+### Server
+`node-express` is used.
+To get dog's photo, Dog API(https://dog.ceo/api/breeds/image/random) is used.
+
+
+
 
 
 
