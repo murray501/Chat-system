@@ -16,7 +16,6 @@ export default function Home() {
         (messages, newMessage) => [newMessage, ...messages],
         []
     );
-    const [useroptions, setUserOptions] = useState([]);
     const [nickname, setNickname] = useState("");
     const [socket, setSocket] = useState();
     const [errorMessage, setErrorMessage] = useState("");
@@ -25,10 +24,12 @@ export default function Home() {
     const [avatar, setAvatar] = useState();
 
     const messageType = () => {
-        if (!useroptions || !useroption) {
+        if (!useroption || useroption.length === 0) {
             return 'public';
         }
-        if (useroption.length === 0 || useroption.length === useroptions.length) {
+        const userlist = (nickname) ? userList.filter(x => x.user !== nickname) : userList
+
+        if (useroption.length === userlist.length) {
             return 'public';
         }
         return 'private';
@@ -62,19 +63,11 @@ export default function Home() {
         }
     }
 
-    const setuserlist = (newlist, nkname) => {
-        console.log("newlist = " + newlist);
-        console.log("nickname = " + nkname);
-        newlist = newlist.filter(x => x.user !== nkname);
-
-        let options = newlist.map(x => {
-            return {value: x.user, label: x.user}
-        })
-        setUserOptions(options);
-        setUserList(newlist);
-    }
-
     function UserSelect() {
+        const userlist = (nickname) ? userList.filter(x => x.user !== nickname) : userList
+        const useroptions = userlist.map(x => {
+            return {value: x.user, label: x.user}
+        });
         return (
                 <Select
                     isMulti
@@ -104,7 +97,6 @@ export default function Home() {
 
     useEffect(() => {
         const socket = io("http://localhost:5000");
-        const nkname = "";
 
         socket.on("connect", () => {
             console.log(socket.id);
@@ -116,7 +108,6 @@ export default function Home() {
             const message = {from: 'System', message: `Welcome! ${msg.user}.`, time: msg.time};
             setMessage(message);
             setAvatar(msg.avatar);
-            nkname = msg.user;
         })
         socket.on('enter', msg => {
             const message= {from: 'System', message: msg.who + " is entered.", time: msg.time};
@@ -127,10 +118,10 @@ export default function Home() {
             setMessage(message);
         })
         socket.on('user list update', userlist => {
-            setuserlist(userlist, nkname);
+            setUserList([...userlist]);
         })
         socket.on('user list', userlist => {
-            setuserlist(userlist, nkname);
+            setUserList(userlist);
         })
         setSocket(socket);
     }, [])
