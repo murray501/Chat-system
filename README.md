@@ -19,7 +19,7 @@ option 1:  using directiory `server` and `client`.
 To get dog's photos, `Dog API`(https://dog.ceo/api/breeds/image/random) is used.
 
 ### Client
-`react` is used.
+`React` is used.
 To work on CSS, `bulma` is used.
 
 
