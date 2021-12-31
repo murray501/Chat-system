@@ -16,7 +16,7 @@ option 1:  using directiory `server` and `client`.
 
 ### Server
 `node-express` is used.
-To get dog's photo, `Dog API`(https://dog.ceo/api/breeds/image/random) is used.
+To get dog's photos, `Dog API`(https://dog.ceo/api/breeds/image/random) is used.
 
 ### Client
 `react` is used.
