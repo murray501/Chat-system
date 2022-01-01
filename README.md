@@ -1,6 +1,6 @@
 # Chat system 
-1.  option 1: using directory `server` and `client`.
-2.  option 2: using directory `chat`
+1.  `option 1`: using directory `server` and `client`.
+2.  `option 2`: using directory `chat`
 ## How to run ? (option 1)
 1. cd server
 2. npm install 
