@@ -1,5 +1,6 @@
 # Chat system 
-option 1:  using directiory `server` and `client`.
+option 1:  using directory `server` and `client`.
+option 2:  using directory `chat`
 ## How to run ? (option 1)
 1. cd server
 2. npm install 
@@ -13,6 +14,13 @@ option 1:  using directiory `server` and `client`.
 10. Can choose multiple receivers.
 11. Messages are grouped by `public` or `private`.
 
+## How to run ? (option2)
+1. cd chat
+2. npm install
+3. npm start -> server run (http://localhost:3000)
+4. acess from the browser
+5. same as option1
+
 ## What are implemented ? (option1)
 `socket.io` is used for communication between server and client.
 
@@ -23,6 +31,9 @@ To get dog's photos, `Dog API`(https://dog.ceo/api/breeds/image/random) is used.
 ### Client
 `React` is used.
 To work on CSS, `bulma` is used.
+
+## What are implemented ? (option2)
+`NextJS` is used, so that server and client are merged.
 
 
 
